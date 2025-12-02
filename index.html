@@ -537,9 +537,11 @@
       color: white;
     }
     @media (max-width: 768px) {
+      /* Give the header a bit more vertical room on mobile so
+         the progress bar and timer aren't clipped */
       .header-section.active {
-        max-height: 70px;
-        padding: 8px 12px;
+        max-height: 90px;
+        padding: 12px 16px;
       }
       .header-top {
         flex-wrap: wrap;
@@ -548,8 +550,9 @@
       #shortcutTip {
         display: none !important;
       }
+      /* Add a small bottom margin to the progress bar for breathing room */
       .progress-bar {
-        margin-bottom: 0 !important;
+        margin-bottom: 8px !important;
       }
     }
     
