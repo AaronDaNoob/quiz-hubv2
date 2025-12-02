@@ -536,6 +536,20 @@
       flex-shrink: 0;
       color: white;
     }
+    @media (max-width: 768px) {
+      .header-section {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 16px;
+      }
+      .header-top {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      #shortcutTip {
+        display: none !important;
+      }
+    }
     
     .content-area {
       flex: 1;
@@ -1046,6 +1060,32 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #555;
     }
+    /* Discord bubble */
+    .discord-bubble {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      background: #5865F2;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 800;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      z-index: 9999;
+      transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+      opacity: 0.98;
+    }
+    .discord-bubble:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(0,0,0,0.45); }
+    .discord-bubble svg { filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08)); }
+
+    @media (max-width: 480px) {
+      .discord-bubble span { display: none; }
+      .discord-bubble { padding: 10px; }
+    }
   </style>
 </head>
 <body class="light-mode">
@@ -1135,6 +1175,13 @@
       </div>
     </div>
   </div>
+
+  <!-- Discord invite bubble with close button -->
+  <!-- Discord invite bubble -->
+  <a id="discordBubble" class="discord-bubble" href="https://discord.gg/YVVjgeMcXT" target="_blank" rel="noopener noreferrer" aria-label="Join our Discord!" style="position:fixed;bottom:22px;right:22px;z-index:9999;">
+    <img id="discordLogoImg" src="discord-logo.svg" alt="Discord" style="width:20px;height:20px;border-radius:6px;object-fit:cover;" onerror="discordLogoFallback()" />
+    <span>Join our Discord!</span>
+  </a>
 
   <script>
 let sidebarCollapsed = false;
@@ -6218,6 +6265,12 @@ function selectQuiz(id) {
   currentTab = 'quiz';
   currentQuizCompleted = false;
   try { startTimer(); } catch (e) {}
+  // Auto-collapse sidebar on mobile when quiz is selected
+  if (window.innerWidth <= 768) {
+    if (!sidebarCollapsed) {
+      toggleSidebar();
+    }
+  }
   renderQuizzes();
   renderQuestion();
   updateHeader();
@@ -6248,6 +6301,7 @@ function updateHeader() {
   const header = document.getElementById('headerSection');
   if (!currentQuiz || currentTab !== 'quiz') {
     header.classList.remove('active');
+    try { const db = document.getElementById('discordBubble'); if (db) db.style.display = 'flex'; } catch(e) {}
     return;
   }
   header.classList.add('active');
@@ -6259,6 +6313,26 @@ function updateHeader() {
   const tipEl = document.getElementById('shortcutTip');
   if (tipEl) {
     tipEl.textContent = "Tip: Use ←/→ to move between questions and ↑/↓ to change options. Press Enter to confirm/advance.";
+  }
+  try { const db = document.getElementById('discordBubble'); if (db) db.style.display = 'flex'; } catch(e) {}
+}
+
+function discordLogoFallback() {
+  try {
+    const img = document.getElementById('discordLogoImg');
+    if (img) img.style.display = 'none';
+    const bubble = document.getElementById('discordBubble');
+    if (!bubble) return;
+    // if SVG not already present, insert it
+    if (!bubble.querySelector('svg')) {
+      bubble.insertAdjacentHTML('afterbegin', `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="#FFFFFF" d="M20.317 4.369A19.791 19.791 0 0016.27 3c-.262.448-.556 1.03-.762 1.492-2.28-.34-4.555-.34-6.813 0-.206-.462-.5-1.044-.763-1.492A19.736 19.736 0 003.683 4.37C.903 9.07.266 13.57.81 18.002a20.59 20.59 0 006.089 3.09c.475-.65.9-1.338 1.27-2.055-1.898-.574-3.686-1.444-5.22-2.56 0 0 .438-.26 1.262-.722 2.294 1.34 4.68 2.19 7.111 2.49 2.423-.31 4.8-1.14 7.096-2.48.824.462 1.26.722 1.26.722-1.536 1.116-3.324 1.986-5.22 2.56.37.717.796 1.405 1.27 2.055a20.59 20.59 0 006.09-3.09c.548-4.436-.553-8.946-3.334-13.633zM9.545 15.568c-1.184 0-2.15-1.085-2.15-2.42 0-1.335.955-2.42 2.15-2.42 1.206 0 2.173 1.095 2.15 2.42 0 1.335-.944 2.42-2.15 2.42zm5.91 0c-1.184 0-2.15-1.085-2.15-2.42 0-1.335.955-2.42 2.15-2.42 1.206 0 2.173 1.095 2.15 2.42 0 1.335-.944 2.42-2.15 2.42z"/>
+        </svg>
+      `);
+    }
+  } catch (e) {
+    console.warn('discordLogoFallback error', e);
   }
 }
 
