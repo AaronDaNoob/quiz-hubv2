@@ -537,10 +537,9 @@
       color: white;
     }
     @media (max-width: 768px) {
-      .header-section {
-        flex-direction: column;
-        gap: 8px;
-        padding: 12px 16px;
+      .header-section.active {
+        max-height: 70px;
+        padding: 8px 12px;
       }
       .header-top {
         flex-wrap: wrap;
@@ -548,6 +547,9 @@
       }
       #shortcutTip {
         display: none !important;
+      }
+      .progress-bar {
+        margin-bottom: 0 !important;
       }
     }
     
